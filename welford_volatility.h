@@ -18,7 +18,7 @@ class WelfordVolatility {
 
     public:
         WelfordVolatility()
-            : m_prev_value {}
+            : m_prev_value { std::nullopt }
             , m_count { 0LL }
             , m_mean { 0.0 }
             , m_m2 { 0.0 }
