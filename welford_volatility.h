@@ -11,7 +11,7 @@ of logarithmic returns i.e. volatility
 */
 class WelfordVolatility {
     private:
-        std::optional<float> m_prev_value;
+        std::optional<double> m_prev_value;
         long long m_count;
         double m_mean;
         double m_m2;
@@ -27,7 +27,7 @@ class WelfordVolatility {
 
         void update(const TradePacket& pack);
         long long get_count();
-        double get_volatility();
+        std::optional<double> get_volatility();
 };
 
 #endif
