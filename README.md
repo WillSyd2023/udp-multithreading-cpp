@@ -19,7 +19,7 @@ graph LR
         I -- Sharding --> W2
         I -- Sharding --> W3
         I -- Sharding --> W4
-        R[Reporter: Reads Shards Every 1 Second]
+        R[Terminal UI: Reads Shards Every 1 Second]
         W1 --> R
         W2 --> R
         W3 --> R
