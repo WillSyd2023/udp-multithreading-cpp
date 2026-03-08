@@ -1,5 +1,7 @@
 #include <mutex>
 #include <iostream>
+#include <string>
+#include "stat_summary.h"
 #include "trade_packet.h"
 #include "welford.h"
 #include "worker.h"
@@ -33,4 +35,16 @@ void WorkerVolatility::print_final_stats() {
                   << " | Count: " << welford.get_count() 
                   << " | Volatility: " << welford.get_volatility().value_or(-1.0) << '\n';
     }
+}
+
+std::vector<StatSummary> WorkerVolatility::get_snapshot() {
+    std::vector<StatSummary> snapshot {};
+    for (auto& [id, welford] : m_welfords) {
+        snapshot.emplace_back(
+            m_stock_symbols[id].data,
+            welford.get_count(),
+            welford.get_volatility().value_or(0.0)
+        );
+    }
+    return snapshot;
 }

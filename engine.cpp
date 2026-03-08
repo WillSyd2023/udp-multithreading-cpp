@@ -14,12 +14,32 @@ void signal_handler(int signal) {
     keep_running = false;
 }
 
+std::vector<std::unique_ptr<WorkerVolatility>> workers {};
+
+void reporter_loop(const std::vector<std::unique_ptr<WorkerVolatility>>& workers) {
+    while (keep_running) {
+        std::this_thread::sleep_for(std::chrono::seconds(1));
+        
+        // ANSI escape codes to clear screen and move cursor to top-left
+        std::cout << "\033[2J\033[H"; 
+        std::cout << "=== HFT RISK ENGINE MONITOR ===\n";
+        std::cout << "SYMBOL\t\tUPDATES\t\tVOLATILITY\n";
+        std::cout << "--------------------------------------------\n";
+
+        for (auto const& w : workers) {
+            auto stats = w->get_snapshot();
+            for (auto const& s : stats) {
+                printf("%-10s\t%-10lld\t%.6f\n", s.name.c_str(), s.count, s.vol);
+            }
+        }
+    }
+}
+
 int main() {
     std::signal(SIGINT, signal_handler);
 
     const int NUM_WORKERS = 4;
     
-    std::vector<std::unique_ptr<WorkerVolatility>> workers;
     workers.reserve(NUM_WORKERS);
     std::vector<std::thread> threads;
     threads.reserve(NUM_WORKERS);
@@ -30,10 +50,14 @@ int main() {
 
     // Start Worker Threads
     for (int i = 0; i < NUM_WORKERS; ++i) {
-        // When running a member function, you need to give the worker's pointer
-        // as argument i.e. via get() given the use of std::unique_ptr
+        // When running a member function, you need to give both:
+        // member function pointer
+        // the worker's pointer as argument i.e. via get() given use of std::unique_ptr
         threads.emplace_back(&WorkerVolatility::update_loop, workers[i].get());
     }
+
+    // Start reporter thread
+    std::thread reporter(reporter_loop, std::ref(workers));
 
     // Setup listening for UDP
     int sockfd = socket(AF_INET, SOCK_DGRAM, 0);
@@ -78,9 +102,12 @@ int main() {
     }
 
     // Optional, mostly for testing purposes
+    /*
     for (auto& w : workers) {
         w->print_final_stats();
     }
+    */
+   reporter.join();
 
     std::cout << "Engine offline.\n";
     return 0;

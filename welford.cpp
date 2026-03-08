@@ -23,7 +23,7 @@ long long WelfordVolatility::get_count() {
 }
 
 std::optional<double> WelfordVolatility::get_volatility() {
-    if (m_count) {
+    if (m_count > 1) {
         return std::sqrt(m_m2 / static_cast<double>(m_count - 1));
     }
 

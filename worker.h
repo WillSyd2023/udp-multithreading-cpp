@@ -9,6 +9,7 @@
 #include <vector>
 #include "trade_packet.h"
 #include "welford.h"
+#include "stat_summary.h"
 #include "sym_chars.h"
 
 class WorkerVolatility {
@@ -34,6 +35,7 @@ class WorkerVolatility {
 
         void update_loop();
         void print_final_stats();
+        std::vector<StatSummary> get_snapshot();
 };
 
 #endif
