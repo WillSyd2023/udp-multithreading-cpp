@@ -52,7 +52,7 @@ int main() {
         if (n <= 0) continue;
 
         // Shard by ID
-        int shard_id {packet.asset_id % NUM_WORKERS};
+        int shard_id {static_cast<int>(packet.asset_id % NUM_WORKERS)};
         auto& worker = workers[shard_id];
 
         // Securely give value to worker and notify

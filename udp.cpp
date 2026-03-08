@@ -44,7 +44,8 @@ int main() {
     while (keep_running) {
         // Create the packet
         int sym_id {symbol_dist(gen)};
-        TradePacket packet {symbols[sym_id], price_dist(gen), vol_dist(gen), sym_id, seq++};
+        TradePacket packet {symbols[sym_id], price_dist(gen), vol_dist(gen), \
+            static_cast<uint32_t>(sym_id), seq++};
 
         // Send the raw binary struct
         ssize_t sent = sendto(sockfd, &packet, sizeof(TradePacket), 0,
