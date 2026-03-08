@@ -1,14 +1,14 @@
 #include <mutex>
 #include "trade_packet.h"
-#include "welford_volatility.h"
-#include "worker_volatility.h"
+#include "welford.h"
+#include "worker.h"
 
 void WorkerVolatility::update_loop() {
     std::vector<TradePacket> local_batch {};
-    while (m_running || !channel.empty()) {
+    while (running || !channel.empty()) {
         std::unique_lock<std::mutex> lock(mux);
 
-        cv.wait(lock, [&]{ return !channel.empty() || !m_running; });
+        cv.wait(lock, [&]{ return !channel.empty() || !running; });
         local_batch.swap(channel);
 
         lock.unlock();

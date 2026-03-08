@@ -1,5 +1,5 @@
 #include <cmath>
-#include "welford_volatility.h"
+#include "welford.h"
 
 void WelfordVolatility::update(const TradePacket& pack) {
     if (not m_prev_value.has_value()) {
