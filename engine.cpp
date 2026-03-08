@@ -77,6 +77,11 @@ int main() {
         t.join();
     }
 
+    // Optional, mostly for testing purposes
+    for (auto& w : workers) {
+        w->print_final_stats();
+    }
+
     std::cout << "Engine offline.\n";
     return 0;
 }

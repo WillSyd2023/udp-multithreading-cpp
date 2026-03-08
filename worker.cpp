@@ -1,4 +1,5 @@
 #include <mutex>
+#include <iostream>
 #include "trade_packet.h"
 #include "welford.h"
 #include "worker.h"
@@ -23,5 +24,13 @@ void WorkerVolatility::update_loop() {
         }
 
         local_batch.clear();
+    }
+}
+
+void WorkerVolatility::print_final_stats() {
+    for (auto& [id, welford] : m_welfords) {
+        std::cout << "Symbol: " << m_stock_symbols[id].data 
+                  << " | Count: " << welford.get_count() 
+                  << " | Volatility: " << welford.get_volatility().value_or(-1.0) << '\n';
     }
 }

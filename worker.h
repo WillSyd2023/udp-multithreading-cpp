@@ -33,6 +33,7 @@ class WorkerVolatility {
         }
 
         void update_loop();
+        void print_final_stats();
 };
 
 #endif
