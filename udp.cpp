@@ -54,7 +54,7 @@ int main() {
         if (sent < 0) perror("Send failed");
 
         // Slow down slightly for debugging
-        usleep(500000); // 500ms delay
+        // usleep(500000); // 500ms delay
         
         if (seq % 10 == 0) std::cout << "Sent " << seq << " packets...\n";
     }

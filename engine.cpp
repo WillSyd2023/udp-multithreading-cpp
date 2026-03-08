@@ -75,6 +75,8 @@ int main() {
 
     // Main ingestor loop
     TradePacket packet;
+    auto start {std::chrono::high_resolution_clock::now()};
+    long long count { 0 };
     while (keep_running) {
         ssize_t n = recvfrom(sockfd, &packet, sizeof(TradePacket), 0, nullptr, nullptr);
         if (n <= 0) continue;
@@ -89,10 +91,15 @@ int main() {
             worker->channel.push_back(packet);
         }
         worker->cv.notify_one();
+        ++count;
     }
-
-    // Graceful shutdown
-    std::cout << "\nShutdown initiated. Draining queues...\n";
+    auto end {std::chrono::high_resolution_clock::now()};
+    const auto diff_ns {
+        std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count()
+    };
+    const auto diff_s {
+        std::chrono::duration_cast<std::chrono::seconds>(end - start).count()
+    };
     
     // Stop all workers from endlessly looping
     for (auto& w : workers) {
@@ -111,7 +118,14 @@ int main() {
         w->print_final_stats();
     }
     */
-   reporter.join();
+    reporter.join();
+    std::cout << "Total time: " << diff_s << "ns\n";
+    std::cout << "Average latency per update: " << \
+        static_cast<double>(diff_ns) / static_cast<double>(count) << "ns\n";
+    std::cout << "Throughtput - updates per second: " << \
+        static_cast<double>(count) / static_cast<double>(diff_s) << "/s\n";
+    // Graceful shutdown
+    std::cout << "\nShutdown initiated. Draining queues...\n";
 
     std::cout << "Engine offline.\n";
     return 0;
