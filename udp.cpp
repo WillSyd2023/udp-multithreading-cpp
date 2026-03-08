@@ -13,6 +13,8 @@ void signal_handler(int signal) {
     keep_running = false;
 }
 
+std::string symbols[4] = {"TSLA", "NVDIA", "MSFT", "ANTH.PVT"};
+
 int main() {
     // Register handler for Ctrl+C (SIGINT)
     std::signal(SIGINT, signal_handler);
@@ -32,6 +34,7 @@ int main() {
 
     // Setup Random Data Generation
     std::mt19937 gen(42);
+    std::uniform_int_distribution<> symbol_dist(0, 3);
     std::uniform_real_distribution<double> price_dist(100.0, 150.0);
     std::uniform_real_distribution<double> vol_dist(1.0, 50.0);
 
@@ -40,11 +43,7 @@ int main() {
     uint32_t seq = 0;
     while (keep_running) {
         // Create the packet
-        TradePacket packet {};
-        packet.price = price_dist(gen);
-        packet.volume = vol_dist(gen);
-        packet.symbol_id = 1;
-        packet.sequence_no = seq++;
+        TradePacket packet {symbols[symbol_dist(gen)], price_dist(gen), vol_dist(gen), seq++};
 
         // Send the raw binary struct
         ssize_t sent = sendto(sockfd, &packet, sizeof(TradePacket), 0,
