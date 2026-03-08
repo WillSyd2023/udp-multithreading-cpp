@@ -32,7 +32,7 @@ void WorkerVolatility::update_loop() {
 void WorkerVolatility::print_final_stats() {
     for (auto& [id, welford] : m_welfords) {
         std::cout << "Symbol: " << m_stock_symbols[id].data 
-                  << " | Count: " << welford.get_count() 
+                  << " | Updates: " << welford.get_count() 
                   << " | Volatility: " << welford.get_volatility().value_or(-1.0) << '\n';
     }
 }
@@ -43,7 +43,7 @@ std::vector<StatSummary> WorkerVolatility::get_snapshot() {
         snapshot.emplace_back(
             m_stock_symbols[id].data,
             welford.get_count(),
-            welford.get_volatility().value_or(0.0)
+            welford.get_volatility().value_or(-1.0)
         );
     }
     return snapshot;

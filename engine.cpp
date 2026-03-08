@@ -29,6 +29,10 @@ void reporter_loop(const std::vector<std::unique_ptr<WorkerVolatility>>& workers
         for (auto const& w : workers) {
             auto stats = w->get_snapshot();
             for (auto const& s : stats) {
+                if (s.vol < 0) {
+                    printf("%-10s\t%-10lld\tN/A\n", s.name.c_str(), s.count);
+                    continue;
+                }
                 printf("%-10s\t%-10lld\t%.6f\n", s.name.c_str(), s.count, s.vol);
             }
         }
