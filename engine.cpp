@@ -21,8 +21,8 @@ void reporter_loop(const std::vector<std::unique_ptr<WorkerVolatility>>& workers
         std::this_thread::sleep_for(std::chrono::seconds(1));
         
         // ANSI escape codes to clear screen and move cursor to top-left
-        std::cout << "\033[2J\033[H"; 
-        std::cout << "=== HFT RISK ENGINE MONITOR ===\n";
+        std::cout << "\033[2J\033[H\n"; 
+        std::cout << "=== VOLATILITY ENGINE MONITOR ===\n";
         std::cout << "SYMBOL\t\tUPDATES\t\tVOLATILITY\n";
         std::cout << "--------------------------------------------\n";
 
@@ -119,7 +119,7 @@ int main() {
     }
     */
     reporter.join();
-    std::cout << "Total time: " << diff_s << "ns\n";
+    std::cout << "Total time: " << diff_s << "s\n";
     std::cout << "Average latency per update: " << \
         static_cast<double>(diff_ns) / static_cast<double>(count) << "ns\n";
     std::cout << "Throughtput - updates per second: " << \

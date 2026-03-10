@@ -42,3 +42,4 @@
 
 # Custom
 *_compiled
+.DS_Store
