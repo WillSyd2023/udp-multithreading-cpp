@@ -14,8 +14,6 @@ void signal_handler(int signal) {
     keep_running = false;
 }
 
-std::vector<std::unique_ptr<WorkerVolatility>> workers {};
-
 void reporter_loop(const std::vector<std::unique_ptr<WorkerVolatility>>& workers) {
     while (keep_running) {
         std::this_thread::sleep_for(std::chrono::seconds(1));
@@ -44,6 +42,7 @@ int main() {
 
     const int NUM_WORKERS = 4;
     
+    std::vector<std::unique_ptr<WorkerVolatility>> workers {};
     workers.reserve(NUM_WORKERS);
     std::vector<std::thread> threads;
     threads.reserve(NUM_WORKERS);
@@ -99,9 +98,10 @@ int main() {
     };
     const auto diff_s {
         std::chrono::duration_cast<std::chrono::seconds>(end - start).count()
-    };
-    
+    };    
+
     // Stop all workers from endlessly looping
+    std::cout << "\nShutdown initiated. Draining queues...\n";
     for (auto& w : workers) {
         std::lock_guard<std::mutex> lock(w->mux);
         w->running = false;
@@ -111,6 +111,14 @@ int main() {
     for (auto& t : threads) {
         t.join();
     }
+    long long count_workers { 0 };
+    for (auto const& w : workers) {
+        auto stats = w->get_snapshot();
+        for (auto const& s : stats) {
+            if (s.vol < 0) continue;
+            count_workers += s.count;
+        }
+    }
 
     // Optional, mostly for testing purposes
     /*
@@ -119,13 +127,18 @@ int main() {
     }
     */
     reporter.join();
+
     std::cout << "Total time: " << diff_s << "s\n";
+    std::cout << "==== Based on the main ingestor loop =============\n";
     std::cout << "Average latency per update: " << \
         static_cast<double>(diff_ns) / static_cast<double>(count) << "ns\n";
     std::cout << "Throughtput - updates per second: " << \
         static_cast<double>(count) / static_cast<double>(diff_s) << "/s\n";
-    // Graceful shutdown
-    std::cout << "\nShutdown initiated. Draining queues...\n";
+    std::cout << "==== Based on the worker threads =================\n";
+    std::cout << "Average latency per update: " << \
+        static_cast<double>(diff_ns) / static_cast<double>(count_workers) << "ns\n";
+    std::cout << "Throughtput - updates per second: " << \
+        static_cast<double>(count_workers) / static_cast<double>(diff_s) << "/s\n";
 
     std::cout << "Engine offline.\n";
     return 0;

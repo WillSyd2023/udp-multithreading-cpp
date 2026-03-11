@@ -28,10 +28,13 @@ graph LR
 ```
 
 ## Performance
-Based on the main ingestor loop of the analytics engine. 
 
-- Average **latency** per update: 5257.34ns
-- **Throughtput**, updates per second: 191799/s
+Measurements taken on an Apple silicon with macOS.
+
+| Measured Segment | Throughput (Max) | Latency per Update (Min) |
+| :--- | :--- | :--- |
+| Main Ingestor Loop | 191,799 updates/sec | 5,257.34 ns |
+| Workers' Loops | 177,227 updates/sec | 5,831.2 ns |
 
 ## Features
 - **UDP Ingestion:** Handles market data updates via sockets.
